@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Chess : MonoBehaviour
 {
-    public bool[,] validMoves = new bool[8, 8];
+    
     public enum ChessType
     {
         King, Queen, Bishop, Knight, Rook, Pawn
@@ -14,28 +14,26 @@ public class Chess : MonoBehaviour
         White, Black
     }
     public Vector3Int startPoint;
-    //[SerializeField] Color defaultColor;
 
 
     public ChessType chessType;
     public ChessTeam chessTeam;
 
+    GameObject staticBoard;
     // Start is called before the first frame update
     private void Start()
     {
-        
+        staticBoard=GameObject.Find("Board");
         transform.position = startPoint;
         if (Board.chessPosition != null)
         {
             //Board.chessPosition[RoundToIntPosition().x, RoundToIntPosition().y] = transform;
         }
-        
+
     }
-
-
     private void Update()
     {
-        SetValidMoves();
+        
     }
 
 
@@ -49,63 +47,97 @@ public class Chess : MonoBehaviour
 
     private void SetValidMoves()
     {
-        ClearValidMoves();
-
+        
         switch (chessType)
         {
-            case ChessType.Queen: QueenValidMoves(); break;
-            case ChessType.King: KingValidMoves(); break;
-            case ChessType.Bishop: BishopValidMoves(); break;
-            case ChessType.Knight: KnightValidMoves(); break;
-            case ChessType.Rook: RookValidMoves(); break;
-            case ChessType.Pawn: PawnValidMoves(); break;
+            
+            case ChessType.Queen: QueenValidMoves();
+                break;
+            case ChessType.King: KingValidMoves();
+                break;
+            case ChessType.Bishop: BishopValidMoves();
+                break;
+            case ChessType.Knight: KnightValidMoves();
+
+                break;
+            case ChessType.Rook: RookValidMoves();
+                break;
+            case ChessType.Pawn: PawnValidMoves();
+                break;
         }
     }
-    void RookValidMoves()
-    {
-        // horizontal valid moves
-        for (int i = 0; i < Board.boardWidth; i++)
-        {
-            if (i != RoundToIntPosition().x)
-            {
-                validMoves[i, RoundToIntPosition().y] = true;
-            }
-        }
-        // vertical valid moves
-        for (int i = 0; i < Board.boardHeight; i++)
-        {
-            if (i != RoundToIntPosition().y)
-            {
-                validMoves[RoundToIntPosition().x, i] = true;
-            }
-        }
-    }
+    
 
     [SerializeField]
-    bool isFirstMove = true;
+    public bool isFirstMove = true;
+
+    void KingValidMoves()
+    {
+        for (int i = 0; i < Board.boardWidth - 1; i++)
+        {
+            for (int j = 0; j < Board.boardHeight - 1; j++)
+            {
+                if (i - RoundToIntPosition().x == 1 && j - RoundToIntPosition().y == 1)
+                {
+                    Board.validMoves[RoundToIntPosition().x + 1, RoundToIntPosition().y + 1] = true;
+                }
+                if (i - RoundToIntPosition().x == -1 && j - RoundToIntPosition().y == 1)
+                {
+                    Board.validMoves[RoundToIntPosition().x - 1, RoundToIntPosition().y + 1] = true;
+                }
+                if (i - RoundToIntPosition().x == 1 && j - RoundToIntPosition().y == -1)
+                {
+                    Board.validMoves[RoundToIntPosition().x + 1, RoundToIntPosition().y - 1] = true;
+                }
+                if (i - RoundToIntPosition().x == -1 && j - RoundToIntPosition().y == -1)
+                {
+                    Board.validMoves[RoundToIntPosition().x - 1, RoundToIntPosition().y - 1] = true;
+                }
+                if (i - RoundToIntPosition().x == -1)
+                {
+                    Board.validMoves[RoundToIntPosition().x - 1, RoundToIntPosition().y] = true;
+                }
+                if (i - RoundToIntPosition().x == 1)
+                {
+                    Board.validMoves[RoundToIntPosition().x + 1, RoundToIntPosition().y] = true;
+                }
+                if (i - RoundToIntPosition().y == 1)
+                {
+                    Board.validMoves[RoundToIntPosition().x, RoundToIntPosition().y + 1] = true;
+                }
+                if (i - RoundToIntPosition().y == -1)
+                {
+                    Board.validMoves[RoundToIntPosition().x, RoundToIntPosition().y - 1] = true;
+                }
+
+            }
+        }
+
+    }
     void PawnValidMoves()
     {
         if (chessTeam == ChessTeam.White)
         {
             if (isFirstMove)
             {
-                validMoves[RoundToIntPosition().x, RoundToIntPosition().y + 2] = true;
-                validMoves[RoundToIntPosition().x, RoundToIntPosition().y + 1] = true;
-            } else
+                Board.validMoves[RoundToIntPosition().x, RoundToIntPosition().y + 2] = true;
+                Board.validMoves[RoundToIntPosition().x, RoundToIntPosition().y + 1] = true;
+            }
+            else
             {
-                validMoves[RoundToIntPosition().x, RoundToIntPosition().y + 1] = true;
+                Board.validMoves[RoundToIntPosition().x, RoundToIntPosition().y + 1] = true;
             }
         }
         else
         {
             if (isFirstMove)
             {
-                validMoves[RoundToIntPosition().x, RoundToIntPosition().y - 2] = true;
-                validMoves[RoundToIntPosition().x, RoundToIntPosition().y - 1] = true;
+                Board.validMoves[RoundToIntPosition().x, RoundToIntPosition().y - 2] = true;
+                Board.validMoves[RoundToIntPosition().x, RoundToIntPosition().y - 1] = true;
             }
-            else 
+            else
             {
-                validMoves[RoundToIntPosition().x, RoundToIntPosition().y - 1] = true;
+                Board.validMoves[RoundToIntPosition().x, RoundToIntPosition().y - 1] = true;
             }
         }
 
@@ -118,38 +150,38 @@ public class Chess : MonoBehaviour
             {
                 if (i - RoundToIntPosition().x == 2 && j - RoundToIntPosition().y == 1)
                 {
-                    validMoves[RoundToIntPosition().x + 2, RoundToIntPosition().y + 1] = true;
+                    Board.validMoves[RoundToIntPosition().x + 2, RoundToIntPosition().y + 1] = true;
                 }
                 if (i - RoundToIntPosition().x == -2 && j - RoundToIntPosition().y == 1)
                 {
-                    validMoves[RoundToIntPosition().x - 2, RoundToIntPosition().y + 1] = true;
+                    Board.validMoves[RoundToIntPosition().x - 2, RoundToIntPosition().y + 1] = true;
                 }
                 if (i - RoundToIntPosition().x == 2 && j - RoundToIntPosition().y == -1)
                 {
-                    validMoves[RoundToIntPosition().x + 2, RoundToIntPosition().y - 1] = true;
+                    Board.validMoves[RoundToIntPosition().x + 2, RoundToIntPosition().y - 1] = true;
                 }
                 if (i - RoundToIntPosition().x == -2 && j - RoundToIntPosition().y == -1)
                 {
-                    validMoves[RoundToIntPosition().x - 2, RoundToIntPosition().y - 1] = true;
+                    Board.validMoves[RoundToIntPosition().x - 2, RoundToIntPosition().y - 1] = true;
                 }
 
 
 
                 if (i - RoundToIntPosition().x == 1 && j - RoundToIntPosition().y == 2)
                 {
-                    validMoves[RoundToIntPosition().x + 1, RoundToIntPosition().y + 2] = true;
+                    Board.validMoves[RoundToIntPosition().x + 1, RoundToIntPosition().y + 2] = true;
                 }
                 if (i - RoundToIntPosition().x == -1 && j - RoundToIntPosition().y == 2)
                 {
-                    validMoves[RoundToIntPosition().x - 1, RoundToIntPosition().y + 2] = true;
+                    Board.validMoves[RoundToIntPosition().x - 1, RoundToIntPosition().y + 2] = true;
                 }
                 if (i - RoundToIntPosition().x == 1 && j - RoundToIntPosition().y == -2)
                 {
-                    validMoves[RoundToIntPosition().x + 1, RoundToIntPosition().y - 2] = true;
+                    Board.validMoves[RoundToIntPosition().x + 1, RoundToIntPosition().y - 2] = true;
                 }
                 if (i - RoundToIntPosition().x == -1 && j - RoundToIntPosition().y == -2)
                 {
-                    validMoves[RoundToIntPosition().x - 1, RoundToIntPosition().y - 2] = true;
+                    Board.validMoves[RoundToIntPosition().x - 1, RoundToIntPosition().y - 2] = true;
                 }
             }
         }
@@ -162,7 +194,7 @@ public class Chess : MonoBehaviour
         {
             if (i != RoundToIntPosition().x)
             {
-                validMoves[i, RoundToIntPosition().y] = true;
+                Board.validMoves[i, RoundToIntPosition().y] = true;
             }
         }
         // vertical valid moves
@@ -170,7 +202,7 @@ public class Chess : MonoBehaviour
         {
             if (i != RoundToIntPosition().y)
             {
-                validMoves[RoundToIntPosition().x, i] = true;
+                Board.validMoves[RoundToIntPosition().x, i] = true;
             }
         }
         // diagonal up-right && up-left valid moves
@@ -182,56 +214,14 @@ public class Chess : MonoBehaviour
                     && (Mathf.Abs(i - RoundToIntPosition().x)
                         == Mathf.Abs(j - RoundToIntPosition().y)))
                 {
-                    validMoves[i, j] = true;
+                    Board.validMoves[i, j] = true;
                 }
             }
         }
 
     }
 
-    void KingValidMoves()
-    {
-        for (int i = 0; i < Board.boardWidth - 1; i++)
-        {
-            for (int j = 0; j < Board.boardHeight - 1; j++)
-            {
-                if (i - RoundToIntPosition().x == 1 && j - RoundToIntPosition().y == 1)
-                {
-                    validMoves[RoundToIntPosition().x + 1, RoundToIntPosition().y + 1] = true;
-                }
-                if (i - RoundToIntPosition().x == -1 && j - RoundToIntPosition().y == 1)
-                {
-                    validMoves[RoundToIntPosition().x - 1, RoundToIntPosition().y + 1] = true;
-                }
-                if (i - RoundToIntPosition().x == 1 && j - RoundToIntPosition().y == -1)
-                {
-                    validMoves[RoundToIntPosition().x + 1, RoundToIntPosition().y - 1] = true;
-                }
-                if (i - RoundToIntPosition().x == -1 && j - RoundToIntPosition().y == -1)
-                {
-                    validMoves[RoundToIntPosition().x - 1, RoundToIntPosition().y - 1] = true;
-                }
-                if (i - RoundToIntPosition().x == -1)
-                {
-                    validMoves[RoundToIntPosition().x - 1, RoundToIntPosition().y] = true;
-                }
-                if (i - RoundToIntPosition().x == 1)
-                {
-                    validMoves[RoundToIntPosition().x + 1, RoundToIntPosition().y] = true;
-                }
-                if (i - RoundToIntPosition().y == 1)
-                {
-                    validMoves[RoundToIntPosition().x, RoundToIntPosition().y + 1] = true;
-                }
-                if (i - RoundToIntPosition().y == -1)
-                {
-                    validMoves[RoundToIntPosition().x, RoundToIntPosition().y - 1] = true;
-                }
-
-            }
-        }
-
-    }
+    
 
     void BishopValidMoves()
     {
@@ -244,68 +234,34 @@ public class Chess : MonoBehaviour
                     && (Mathf.Abs(i - RoundToIntPosition().x)
                         == Mathf.Abs(j - RoundToIntPosition().y)))
                 {
-                    validMoves[i, j] = true;
+                    Board.validMoves[i, j] = true;
                 }
             }
         }
     }
-    void ClearValidMoves()
+    void RookValidMoves()
     {
+        // horizontal valid moves
         for (int i = 0; i < Board.boardWidth; i++)
         {
-            for (int j = 0; j < Board.boardHeight; j++)
+            if (i != RoundToIntPosition().x)
             {
-                validMoves[i, j] = false;
+                Board.validMoves[i, RoundToIntPosition().y] = true;
+            }
+        }
+        // vertical valid moves
+        for (int i = 0; i < Board.boardHeight; i++)
+        {
+            if (i != RoundToIntPosition().y)
+            {
+                Board.validMoves[RoundToIntPosition().x, i] = true;
             }
         }
     }
-    
-    bool toggleRender = false;
-    void RenderValidMoves()
-    {
-
-
-        if (!toggleRender)
-        {
-
-            for (int x = 0; x < Board.boardWidth; x++)
-            {
-                for (int y = 0; y < Board.boardHeight; y++)
-                {
-
-                    if (validMoves[x, y])
-                    {
-                        Board.board[x, y].GetComponent<SpriteRenderer>().color = Color.cyan;
-                    }
-                    else
-                    {
-                        Debug.Log(Board.colorIndex[x, y].r + "," + Board.colorIndex[x, y].g + "," + Board.colorIndex[x, y].b);
-                        Board.board[x, y].GetComponent<SpriteRenderer>().color = Board.colorIndex[x, y];
-                    }
-                }
-            }
-        }
-        else
-        {
-
-            for (int x = 0; x < Board.boardWidth; x++)
-            {
-                for (int y = 0; y < Board.boardHeight; y++)
-                {
-
-                    if (validMoves[x, y])
-                    {
-                        Board.board[x, y].GetComponent<SpriteRenderer>().color = Board.colorIndex[x, y];
-                    }
-                }
-            }
-        }
-        toggleRender = !toggleRender;
-    }
-
     private void OnMouseDown()
     {
-        Debug.Log("mouse click");
-        RenderValidMoves();
+        Board.chosenChess = transform;
+        SetValidMoves();
+        Board.RenderValidMoves();
     }
 }

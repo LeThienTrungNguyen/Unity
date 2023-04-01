@@ -14,14 +14,63 @@ public class Board : MonoBehaviour
     public static Transform[,] board;
     public static Transform[,] chessPosition;
     public static Color[,] colorIndex;
+
+    public static Transform chosenChess;
+
+    public static bool[,] validMoves = new bool[8, 8];
     // Start is called before the first frame update
     void Start()
     {
+        ClearValidMoves();
         BoardInit();
     }
 
+    public Vector3Int worldMousePos;
     // Update is called once per frame
-   
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            worldMousePos.x = Mathf.RoundToInt(mousePos.x);
+            worldMousePos.y = Mathf.RoundToInt(mousePos.y);
+            worldMousePos.z = Mathf.RoundToInt(mousePos.z);
+
+            if (chosenChess != null)
+            {
+                Debug.Log(chosenChess);
+                for(int x = 0;x< validMoves.GetLength(0); x++)
+                {
+                    for (int y = 0; y < validMoves.GetLength(1); y++)
+                    {
+                        Debug.Log("board "+board[x, y].position);
+                        Debug.Log("mouse " + worldMousePos);
+                        if (worldMousePos.x == Mathf.RoundToInt(board[x, y].position.x)
+                            && worldMousePos.y == Mathf.RoundToInt(board[x, y].position.y
+                            ) && validMoves[x,y])
+                        {
+                            Debug.Log(1);
+                            chosenChess.position = new Vector3Int(worldMousePos.x, worldMousePos.y, Mathf.RoundToInt(chosenChess.position.z));
+
+                            if (chosenChess.GetComponent<Chess>().chessType == Chess.ChessType.Pawn)
+                            {
+                                chosenChess.GetComponent<Chess>().isFirstMove = false;
+                            }
+                            chosenChess = null;
+                            ClearValidMoves();
+
+                            toggleRender = !toggleRender;
+                            RenderValidMoves();
+                            toggleRender = !toggleRender;
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 
     void BoardInit()
     {
@@ -61,9 +110,69 @@ public class Board : MonoBehaviour
             {
                 int x = child.GetComponent<Chess>().RoundToIntPosition().x;
                 int y = child.GetComponent<Chess>().RoundToIntPosition().y;
-                Debug.Log($"x = {x}, y = {y}");
+                
                 chessPosition[x, y] = child;
             }
         }
     }
+
+    public static bool  toggleRender = false;
+    public static void RenderValidMoves()
+    {
+
+        if (!toggleRender)
+        {
+            for (int x = 0; x < boardWidth; x++)
+            {
+                for (int y = 0; y < boardHeight; y++)
+                {
+                    if (validMoves[x, y])
+                    {
+                        board[x, y].GetComponent<SpriteRenderer>().color = Color.cyan;
+                    }
+                    else
+                    {
+                        board[x, y].GetComponent<SpriteRenderer>().color = colorIndex[x, y];
+                    }
+                }
+            }
+        }
+        else
+        {
+            chosenChess = null;
+            for (int x = 0; x < boardWidth; x++)
+            {
+                for (int y = 0; y < boardHeight; y++)
+                {
+
+                    if (validMoves[x, y])
+                    {
+                        validMoves[x, y] = false;
+                        board[x, y].GetComponent<SpriteRenderer>().color = colorIndex[x, y];
+                    }
+                }
+            }
+        }
+        toggleRender = !toggleRender;
+    }
+
+    public void ClearValidMoves()
+    {
+        for(int x = 0; x < boardWidth; x++)
+        {
+            for (int y = 0; y < boardHeight; y++)
+            {
+                validMoves[x, y] = false;
+            }
+        }
+    }
+
+    public Vector2Int RoundToIntPosition(float xPos,float yPos)
+    {
+        int x = Mathf.RoundToInt(xPos);
+        int y = Mathf.RoundToInt(yPos);
+
+        return new Vector2Int(x, y);
+    }
+
 }
