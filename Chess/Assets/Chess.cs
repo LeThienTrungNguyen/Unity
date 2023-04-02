@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Chess : MonoBehaviour
 {
-    
+
     public enum ChessType
     {
         King, Queen, Bishop, Knight, Rook, Pawn
@@ -23,7 +23,7 @@ public class Chess : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        staticBoard=GameObject.Find("Board");
+        staticBoard = GameObject.Find("Board");
         transform.position = startPoint;
         if (Board.chessPosition != null)
         {
@@ -33,7 +33,13 @@ public class Chess : MonoBehaviour
     }
     private void Update()
     {
-        
+        int x = RoundToIntPosition().x;
+        int y = RoundToIntPosition().y;
+        if (Board.validMoves[x, y])
+        {
+            GetComponent<BoxCollider2D>().enabled = false;
+            //Destroy(gameObject);
+        } else GetComponent<BoxCollider2D>().enabled = true;
     }
 
 
@@ -47,10 +53,10 @@ public class Chess : MonoBehaviour
 
     private void SetValidMoves()
     {
-        
+
         switch (chessType)
         {
-            
+
             case ChessType.Queen: QueenValidMoves();
                 break;
             case ChessType.King: KingValidMoves();
@@ -66,11 +72,11 @@ public class Chess : MonoBehaviour
                 break;
         }
     }
-    
+
 
     [SerializeField]
     public bool isFirstMove = true;
-
+    
     void KingValidMoves()
     {
         for (int i = 0; i < Board.boardWidth - 1; i++)
@@ -186,7 +192,6 @@ public class Chess : MonoBehaviour
             }
         }
     }
-
     void QueenValidMoves()
     {
         // horizontal valid moves
@@ -220,9 +225,6 @@ public class Chess : MonoBehaviour
         }
 
     }
-
-    
-
     void BishopValidMoves()
     {
         // diagonal up-right && up-left valid moves
@@ -258,10 +260,27 @@ public class Chess : MonoBehaviour
             }
         }
     }
+
+
+
     private void OnMouseDown()
     {
         Board.chosenChess = transform;
         SetValidMoves();
         Board.RenderValidMoves();
+    }
+
+    private void OnDestroy()
+    {
+        Board.chessPosition[RoundToIntPosition().x, RoundToIntPosition().y] = null;
+    }
+
+    bool IsDiffirentTeam(Transform enemy)
+    {
+        if(enemy.GetComponent<ChessTeam>()!= transform.GetComponent<ChessTeam>())
+        {
+            return true;
+        }
+        return false;
     }
 }
