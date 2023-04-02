@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57ec5ced9ece3be4f86347e66cebfcfa, type: 3}
+  m_Name: PlayerableObject
+  m_EditorClassIdentifier: 
+  players:
+  - id: 0
+    name: 
+    controller: {fileID: 0}
+    avatar: {fileID: 0}
+  - id: 1
+    name: Mask Dude
+    controller: {fileID: 22100000, guid: e8f93b9112cfd3d4d8e6f5e21781eddb, type: 2}
+    avatar: {fileID: 257958379, guid: 5321f00f9b3d4a44f8e7f7e4c3baa6dc, type: 3}
+  - id: 2
+    name: Ninja Frog
+    controller: {fileID: 9100000, guid: 7bc39e5d887cd53479eea2becb36b37e, type: 2}
+    avatar: {fileID: 1145430170, guid: 94e6aa7221203dc4ba4ee2af97c18964, type: 3}
+  - id: 3
+    name: Pink Man
+    controller: {fileID: 22100000, guid: 61acd2df3a002124eb03c218885fda17, type: 2}
+    avatar: {fileID: 1845014690, guid: 98aac84630e98ed45990eee0470b0332, type: 3}
+  - id: 4
+    name: Virtual Man
+    controller: {fileID: 22100000, guid: 4b924ed986d87d94e9bdbc0645ab27dc, type: 2}
+    avatar: {fileID: 1442324972, guid: 2a07ffd6c64f5d74e8e27fb3529c3694, type: 3}
+  chosenIndex: 3

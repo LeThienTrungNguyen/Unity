@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 314fac21ccc81c34bb3bf07c2d6afec8, type: 3}
+  m_Name: FruitableObject
+  m_EditorClassIdentifier: 
+  fruits:
+  - id: 0
+    name: 
+    controller: {fileID: 0}
+    avatar: {fileID: 0}
+  - id: 1
+    name: Apple
+    controller: {fileID: 9100000, guid: 7288f4aace88a2a4a9351c0354f63e7d, type: 2}
+    avatar: {fileID: -569510818, guid: 315ff3cef49491b4b91c30064770cfb1, type: 3}
+  - id: 2
+    name: Banana
+    controller: {fileID: 9100000, guid: 1c3e881133dc426438a359e49cb9e4d8, type: 2}
+    avatar: {fileID: -839521185, guid: c875acc1a0b788b448614bc83d050670, type: 3}
+  - id: 3
+    name: Cherry
+    controller: {fileID: 9100000, guid: ca9bfa3b405f8f34ca0ffe4289f3a5f5, type: 2}
+    avatar: {fileID: -1503814694, guid: 37f89899694e04d41a703790c4344d8d, type: 3}
+  - id: 4
+    name: Kiwi
+    controller: {fileID: 9100000, guid: c0a5743c24d79a345a787ea37a13fdff, type: 2}
+    avatar: {fileID: 48110296, guid: 6b9ebced5204ef84888e55ed2cdb423e, type: 3}
+  - id: 5
+    name: Melon
+    controller: {fileID: 9100000, guid: e8cf7d50fd532454b98781f6573705ad, type: 2}
+    avatar: {fileID: -1073698452, guid: 044d6a9f57a7e824291e1ce1c103494f, type: 3}
+  - id: 6
+    name: Orange
+    controller: {fileID: 9100000, guid: 41dc93a01184a064e9b05e7470843408, type: 2}
+    avatar: {fileID: -134145572, guid: 1b5c70af1ec186a49a4f479b3b812b96, type: 3}
+  - id: 7
+    name: Pineapple
+    controller: {fileID: 9100000, guid: 1a044498af4c26f40a56bedd5e945629, type: 2}
+    avatar: {fileID: 1221048059, guid: 7e371bc21cfe6c340b4be21fc7e0facf, type: 3}
+  - id: 8
+    name: Strawberry
+    controller: {fileID: 9100000, guid: 4e9683f397d8926479c7ad86f2346c12, type: 2}
+    avatar: {fileID: 1338070703, guid: 1b2316fe9d37de541b51347b9385a0d7, type: 3}
+  chosenIndex: 4
