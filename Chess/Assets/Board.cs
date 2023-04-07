@@ -4,65 +4,63 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
-    public static int boardWidth = 8;
-    public static int boardHeight = 8;
-    public Color BoardColor1;
-    public Color BoardColor2;
-
-    public Transform boardIndex;
-
+    [SerializeField] int height;
+    [SerializeField] int width;
+    [SerializeField] Vector3Int mousePosition;
     public static Transform[,] board;
-    public static Transform[,] chessPosition;
-    public static Color[,] colorIndex;
-
-    public static Transform chosenChess;
-
-    public static bool[,] validMoves = new bool[8, 8];
-    // Start is called before the first frame update
-    void Start()
+    public static Transform[,] chessPositions;
+    public static bool[,] validMoves;
+    public Chess[] chesses;
+    public Transform chessPrefab;
+    private void Awake()
     {
-        ClearValidMoves();
-        BoardInit();
+        height = 8;
+        width = 8;
+        board = new Transform[width, height];
+        chessPositions = new Transform[width, height];
+        validMoves = new bool[width, height];
+        InitBoard();
+        InitChess();
     }
 
-    public Vector3Int worldMousePos;
-    // Update is called once per frame
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        HoverUnit();
+        OnClick();
+        RenderValidMoves(true);
+    }
+
+    public void RenderValidMoves(bool allow)
+    {
+        if (allow)
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            worldMousePos.x = Mathf.RoundToInt(mousePos.x);
-            worldMousePos.y = Mathf.RoundToInt(mousePos.y);
-            worldMousePos.z = Mathf.RoundToInt(mousePos.z);
-
-            if (chosenChess != null)
+            for (int c = 0; c < width; c++)
             {
-                Debug.Log(chosenChess);
-                for(int x = 0;x< validMoves.GetLength(0); x++)
+                for (int r = 0; r < height; r++)
                 {
-                    for (int y = 0; y < validMoves.GetLength(1); y++)
+                    if (validMoves[c, r])
                     {
-                        Debug.Log("board "+board[x, y].position);
-                        Debug.Log("mouse " + worldMousePos);
-                        if (worldMousePos.x == Mathf.RoundToInt(board[x, y].position.x)
-                            && worldMousePos.y == Mathf.RoundToInt(board[x, y].position.y
-                            ) && validMoves[x,y])
+                        board[c, r].GetComponent<SpriteRenderer>().color = Color.red;
+                    }
+                }
+            }
+        } else
+        {
+            for (int c = 0; c < width; c++)
+            {
+                for (int r = 0; r < height; r++)
+                {
+                    if (validMoves[c, r])
+                    {
+                        board[c, r].GetComponent<SpriteRenderer>().color = Color.red;
+                    } else
+                    {
+                        if((c % 2 == 0 && r % 2 == 0)|| (c % 2 != 0 && r % 2 != 0))
                         {
-                            Debug.Log(1);
-                            chosenChess.position = new Vector3Int(worldMousePos.x, worldMousePos.y, Mathf.RoundToInt(chosenChess.position.z));
-
-                            if (chosenChess.GetComponent<Chess>().chessType == Chess.ChessType.Pawn)
-                            {
-                                chosenChess.GetComponent<Chess>().isFirstMove = false;
-                            }
-                            chosenChess = null;
-                            ClearValidMoves();
-
-                            toggleRender = !toggleRender;
-                            RenderValidMoves();
-                            toggleRender = !toggleRender;
-
+                            board[c, r].GetComponent<SpriteRenderer>().color = Color.white;
+                        } else
+                        {
+                            board[c, r].GetComponent<SpriteRenderer>().color = Color.black;
                         }
                     }
                 }
@@ -70,109 +68,168 @@ public class Board : MonoBehaviour
         }
     }
 
+    public static Transform chosenChess;
 
-
-    void BoardInit()
+    void OnClick()
     {
-        chessPosition = new Transform[boardWidth, boardHeight];
-        board = new Transform[boardWidth, boardHeight];
-        colorIndex = new Color[boardWidth, boardHeight];
-        // create transform and change color
-        for (int cell = 0; cell < boardWidth; cell++)
+        if (Input.GetMouseButtonDown(0) && CheckMouseInBoard())
         {
-            for(int row = 0;row < boardHeight; row++)
+            int x = GetMousePosition().x;
+            int y = GetMousePosition().y;
+            if (chosenChess != null && validMoves[x,y])
             {
-                board[cell, row] = Instantiate(boardIndex, new Vector2(cell, row),transform.rotation,transform);
-                
-                if( (cell % 2 == 0 && row % 2 == 0) || (cell % 2 != 0 && row % 2 != 0))
+                if (chessPositions[x, y] != null)
                 {
-                    board[cell, row].GetComponent<SpriteRenderer>().color = BoardColor1;
-                    colorIndex[cell, row] = board[cell, row].GetComponent<SpriteRenderer>().color;
+                    if(chesses[FindChessIndex(x, y)].chessTeam != chesses[FindChessIndex((int)chosenChess.position.x, (int)chosenChess.position.y)].chessTeam)
+                    {
+                        //chesses[FindChessIndex(x, y)].position = new Vector2Int(-1, 0);
+                        Destroy(chessPositions[x, y].gameObject);
+                        Debug.Log(1);
+                    }
+                }
+            }
+            if ((!validMoves[x, y] && chessPositions[x, y] != null) || (!validMoves[x, y] && chessPositions[x, y] == null))
+            {
+                ClearValidMoves();
+                chosenChess = null;
+            } else
+            {
+                
+                int index = FindChessIndex((int)chosenChess.position.x, (int)chosenChess.position.y);
+                if(index != -1)
+                {
+                    chesses[index].position.x = x;
+                    chesses[index].position.y = y;
+                }
+                chessPositions[(int)chosenChess.position.x, (int)chosenChess.position.y] = null;
+                chosenChess.position = mousePosition;
+                chessPositions[x, y] = chosenChess;
+
+                
+                ClearValidMoves();
+            }
+
+            
+
+            if (chessPositions[x, y] != null)
+            {
+                chosenChess = chessPositions[x, y];
+                int index = FindChessIndex(x, y);
+                if (index >=0)
+                {
+                    switch (chesses[index].chessType)
+                    {
+                        case Chess.ChessType.King: chesses[index].King(); break;
+                        case Chess.ChessType.Queen: chesses[index].Queen(); break;
+                        case Chess.ChessType.Bishop: chesses[index].Bishop(); break;
+                        case Chess.ChessType.Knight: chesses[index].Knight(); break;
+                        case Chess.ChessType.Rook: chesses[index].Rook(); break;
+                        case Chess.ChessType.Pawn: chesses[index].Pawn(); break;
+                        default: break;
+                    }
+                }
+            }
+        }
+    }
+    void ClearValidMoves()
+    {
+        for(int c = 0; c < width; c++)
+        {
+            for (int r = 0; r < height; r++)
+            {
+                validMoves[c, r] = false;
+            }
+        }
+    }
+    public int FindChessIndex(int x,int y)
+    {
+
+        for(int i = 0; i < chesses.Length; i++)
+        {
+            //Debug.Log(chesses[i].position.x +" "+ chesses[i].position.y + " "+x+ " "+ y);
+            if (chesses[i].position.x == x && chesses[i].position.y == y)
+            {
+                return i;
+            }
+        }
+        
+        return -1;
+    }
+
+    void HoverUnit()
+    {
+        if (CheckMouseInBoard())
+        {
+            for(int c=0;c< width; c++)
+            {
+                for(int r = 0; r < height; r++)
+                {
                     
+                    if (board[c,r].position.x == GetMousePosition().x && board[c, r].position.y == GetMousePosition().y)
+                    {
+                        board[c, r].GetComponent<SpriteRenderer>().color = Color.cyan;
+                    } else
+                    {
+                        if((c % 2 == 0 && r % 2 == 0)|| (c % 2 != 0 && r % 2 != 0))
+                        {
+                            board[c, r].GetComponent<SpriteRenderer>().color = Color.white;
+                        } else
+                        {
+                            board[c, r].GetComponent<SpriteRenderer>().color = Color.gray;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public Transform boardIndex;
+    void InitBoard()
+    {
+        for(int c = 0;c < width; c++)
+        {
+            for(int r = 0;r < height; r++)
+            {
+                board[c, r] = Instantiate(boardIndex, new Vector3(c, r, transform.position.z), transform.rotation, transform);
+                if((c % 2 == 0 && r % 2 == 0) || (c % 2 != 0 && r % 2 != 0))
+                {
+                    board[c, r].GetComponent<SpriteRenderer>().color = Color.white;
                 } else
                 {
-                    board[cell, row].GetComponent<SpriteRenderer>().color = BoardColor2;
-                    colorIndex[cell, row] = board[cell, row].GetComponent<SpriteRenderer>().color;
-                }
-                
-            }
-        }
-
-        ChessPositions();
-    }
-
-    void ChessPositions()
-    {
-        GameObject chess = GameObject.Find("Chess");
-        if(chess != null)
-        {
-            foreach(Transform child in chess.transform)
-            {
-                int x = child.GetComponent<Chess>().RoundToIntPosition().x;
-                int y = child.GetComponent<Chess>().RoundToIntPosition().y;
-                
-                chessPosition[x, y] = child;
-            }
-        }
-    }
-
-    public static bool  toggleRender = false;
-    public static void RenderValidMoves()
-    {
-
-        if (!toggleRender)
-        {
-            for (int x = 0; x < boardWidth; x++)
-            {
-                for (int y = 0; y < boardHeight; y++)
-                {
-                    if (validMoves[x, y])
-                    {
-                        board[x, y].GetComponent<SpriteRenderer>().color = Color.cyan;
-                    }
-                    else
-                    {
-                        board[x, y].GetComponent<SpriteRenderer>().color = colorIndex[x, y];
-                    }
+                    board[c, r].GetComponent<SpriteRenderer>().color = Color.gray;
                 }
             }
         }
-        else
-        {
-            chosenChess = null;
-            for (int x = 0; x < boardWidth; x++)
-            {
-                for (int y = 0; y < boardHeight; y++)
-                {
-
-                    if (validMoves[x, y])
-                    {
-                        validMoves[x, y] = false;
-                        board[x, y].GetComponent<SpriteRenderer>().color = colorIndex[x, y];
-                    }
-                }
-            }
-        }
-        toggleRender = !toggleRender;
     }
-
-    public void ClearValidMoves()
+    void InitChess()
     {
-        for(int x = 0; x < boardWidth; x++)
+        for(int count = 1;count < chesses.Length; count++)
         {
-            for (int y = 0; y < boardHeight; y++)
-            {
-                validMoves[x, y] = false;
-            }
+            int x = chesses[count].position.x;
+            int y = chesses[count].position.y;
+            chessPositions[x, y] = Instantiate(chessPrefab, new Vector3Int(x, y, -1), transform.rotation, transform);
+            chessPositions[x, y].GetComponent<SpriteRenderer>().sprite = chesses[count].avatar;
+            chessPositions[x, y].name = chesses[count].chessType.ToString() + chesses[count].chessTeam.ToString();
+            
         }
     }
 
-    public Vector2Int RoundToIntPosition(float xPos,float yPos)
+    public Vector3Int GetMousePosition()
     {
-        int x = Mathf.RoundToInt(xPos);
-        int y = Mathf.RoundToInt(yPos);
-
-        return new Vector2Int(x, y);
+        Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition = RoundToInt(worldMousePosition.x, worldMousePosition.y);
+        return mousePosition;
     }
 
+    Vector3Int RoundToInt(float x,float y)
+    {
+        return new Vector3Int(Mathf.RoundToInt(x), Mathf.RoundToInt(y));
+    }
+
+    public bool CheckMouseInBoard()
+    {
+        int x = GetMousePosition().x;
+        int y = GetMousePosition().y;
+        return (x >= 0 && x <= width && y >= 0 && y <= height) ? true : false;
+    }
 }
